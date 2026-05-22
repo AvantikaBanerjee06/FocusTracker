@@ -346,6 +346,24 @@
       transform: scale(1.5);
     }
 
+    /* ── Mute button ─────────────────────────────────────── */
+    .mute-btn {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      background: none;
+      border: none;
+      font-size: 1.05rem;
+      line-height: 1;
+      padding: 4px 6px;
+      cursor: pointer;
+      opacity: 0.35;
+      transition: opacity 0.2s ease;
+      border-radius: 6px;
+    }
+    .mute-btn:hover  { opacity: 0.75; }
+    .mute-btn:active { transform: scale(0.9); }
+
     /* ── Theme switcher ───────────────────────────────────── */
     .theme-switcher {
       position: fixed;
@@ -354,7 +372,7 @@
       transform: translateX(-50%);
       display: flex;
       gap: 6px;
-      z-index: 10;
+      z-index: 31;
       background: rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
@@ -744,6 +762,31 @@
       transition: color 0.15s;
     }
     .tasks-clear-btn:hover { color: #ef4444; }
+
+    /* ── Timer card hidden by default (shown only on Timer tab) ── */
+    #timer-card { display: none; }
+
+    /* ── Home tasks section ─────────────────────────────────────── */
+    .home-tasks-section { margin-top: 28px; text-align: left; }
+    .home-tasks-label {
+      font-size: 0.68rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.26);
+      margin-bottom: 14px;
+    }
+
+    /* ── Drag-to-reorder ────────────────────────────────────────── */
+    .task-item[draggable="true"] { cursor: grab; }
+    .task-item.dragging { opacity: 0.3; border-style: dashed; }
+    .task-item.drag-over { border-color: rgba(99,102,241,0.5); background: rgba(99,102,241,0.08); }
+    .drag-handle {
+      flex-shrink: 0;
+      color: rgba(255,255,255,0.15);
+      font-size: 15px;
+      user-select: none;
+      cursor: grab;
+    }
   </style>
 </head>
 <body class="theme-cafe">
@@ -752,10 +795,10 @@
     <button class="nav-btn active" data-view="home">Home</button>
     <button class="nav-btn"        data-view="timer">Timer</button>
     <button class="nav-btn"        data-view="dashboard">Dashboard</button>
-    <button class="nav-btn"        data-view="tasks">Tasks</button>
   </nav>
 
-  <div class="card">
+  <div class="card" id="timer-card">
+    <button id="muteBtn" class="mute-btn" title="Toggle sound">🔊</button>
     <p class="title">Focus Timer</p>
     <p class="subtitle" id="subtitle">stay present, one cup at a time</p>
     <div class="divider"></div>
@@ -808,15 +851,19 @@
           <div class="home-stat-val" id="home-distract-val">--</div>
           <div class="home-stat-lbl" style="color:#f59e0b88">Distraction</div>
         </div>
-        <div class="home-stat-card">
-          <div class="home-stat-val" id="home-tasks-val">--</div>
-          <div class="home-stat-lbl">Tasks Done</div>
-        </div>
       </div>
 
-      <div class="home-actions">
-        <button class="home-btn home-btn-primary" id="home-timer-btn">Start Session</button>
-        <button class="home-btn home-btn-ghost"   id="home-dash-btn">Dashboard</button>
+      <div class="home-tasks-section">
+        <p class="home-tasks-label">Tasks</p>
+        <div class="task-input-row">
+          <input type="text" id="task-input" placeholder="Add a task…" autocomplete="off" />
+          <button id="task-add-btn">Add</button>
+        </div>
+        <div class="task-list" id="task-list"></div>
+        <div class="tasks-footer">
+          <span class="tasks-count" id="tasks-count"></span>
+          <button class="tasks-clear-btn" id="tasks-clear-btn">Clear completed</button>
+        </div>
       </div>
     </div>
   </div>
@@ -880,44 +927,28 @@
     </div>
   </div><!-- /#view-dashboard -->
 
-  <!-- Tasks view -->
-  <div id="view-tasks" class="panel">
-    <div class="tasks-wrap">
-      <p class="tasks-heading">To-Do List</p>
-      <div class="task-input-row">
-        <input type="text" id="task-input" placeholder="Add a task…" autocomplete="off" />
-        <button id="task-add-btn">Add</button>
-      </div>
-      <div class="task-list" id="task-list"></div>
-      <div class="tasks-footer">
-        <span class="tasks-count" id="tasks-count"></span>
-        <button class="tasks-clear-btn" id="tasks-clear-btn">Clear completed</button>
-      </div>
-    </div>
-  </div>
-
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="timer.js"></script>
   <script>
   (function () {
     // ── State ────────────────────────────────────────────────────
-    let currentRange   = 'today';
-    let dashRefreshId  = null;
+    let currentRange  = 'today';
+    let dashRefreshId = null;
+    let dragId        = null;
 
     // ── Panel & nav management ───────────────────────────────────
     const PANELS = {
       home:      document.getElementById('view-home'),
       dashboard: document.getElementById('view-dashboard'),
-      tasks:     document.getElementById('view-tasks'),
     };
+    const timerCard = document.getElementById('timer-card');
 
     function switchTo(view) {
       Object.values(PANELS).forEach(p => p.classList.remove('open'));
       stopDashRefresh();
+      timerCard.style.display = view === 'timer' ? 'block' : 'none';
       if (view === 'home')      { PANELS.home.classList.add('open');      loadHome(); }
       if (view === 'dashboard') { PANELS.dashboard.classList.add('open'); loadDashboard(); startDashRefresh(); }
-      if (view === 'tasks')     { PANELS.tasks.classList.add('open');     renderTasks(); }
-      // 'timer' — just close overlays so the card behind shows
     }
 
     document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -927,12 +958,6 @@
         switchTo(btn.dataset.view);
       });
     });
-
-    function navTo(view) {
-      document.querySelectorAll('.nav-btn').forEach(b =>
-        b.classList.toggle('active', b.dataset.view === view));
-      switchTo(view);
-    }
 
     // ── Extension data bridge ────────────────────────────────────
     function fetchData() {
@@ -1030,13 +1055,8 @@
       document.getElementById('home-focus-val').textContent    = focusSecs    ? fmt(focusSecs)    : '--';
       document.getElementById('home-distract-val').textContent = distractSecs ? fmt(distractSecs) : '--';
 
-      const tasks = getTasks();
-      const done  = tasks.filter(t => t.done).length;
-      document.getElementById('home-tasks-val').textContent    = tasks.length ? `${done}/${tasks.length}` : '--';
+      renderTasks();
     }
-
-    document.getElementById('home-timer-btn').addEventListener('click', () => navTo('timer'));
-    document.getElementById('home-dash-btn').addEventListener('click',  () => navTo('dashboard'));
 
     // ── Dashboard — date range ───────────────────────────────────
     document.querySelectorAll('.range-btn').forEach(btn => {
@@ -1221,10 +1241,43 @@
         return;
       }
 
-      // Pending first, completed last
-      [...tasks].sort((a, b) => a.done - b.done).forEach(task => {
-        const row   = document.createElement('div');
+      tasks.forEach(task => {
+        const row = document.createElement('div');
         row.className = `task-item${task.done ? ' done' : ''}`;
+        row.draggable = true;
+        row.dataset.id = task.id;
+
+        row.addEventListener('dragstart', () => {
+          dragId = task.id;
+          row.classList.add('dragging');
+        });
+        row.addEventListener('dragend', () => {
+          dragId = null;
+          row.classList.remove('dragging');
+          document.querySelectorAll('.task-item').forEach(r => r.classList.remove('drag-over'));
+        });
+        row.addEventListener('dragover', e => {
+          e.preventDefault();
+          if (task.id !== dragId) row.classList.add('drag-over');
+        });
+        row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+        row.addEventListener('drop', e => {
+          e.preventDefault();
+          row.classList.remove('drag-over');
+          if (dragId === null || dragId === task.id) return;
+          const all = getTasks();
+          const fromIdx = all.findIndex(x => x.id === dragId);
+          const toIdx   = all.findIndex(x => x.id === task.id);
+          if (fromIdx === -1 || toIdx === -1) return;
+          const [moved] = all.splice(fromIdx, 1);
+          all.splice(toIdx, 0, moved);
+          saveTasks(all);
+          renderTasks();
+        });
+
+        const handle = document.createElement('span');
+        handle.className   = 'drag-handle';
+        handle.textContent = '⋮⋮';
 
         const check = document.createElement('div');
         check.className = `task-check${task.done ? ' checked' : ''}`;
@@ -1247,6 +1300,7 @@
           renderTasks();
         });
 
+        row.appendChild(handle);
         row.appendChild(check);
         row.appendChild(text);
         row.appendChild(del);
@@ -1276,7 +1330,6 @@
 
     // ── Init ─────────────────────────────────────────────────────
     loadHome();
-    renderTasks();
   })();
   </script>
 </body>

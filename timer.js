@@ -44,6 +44,23 @@ ambientAudio.volume = 0.35
 let currentTheme   = 'cafe'
 ambientAudio.src   = themes[currentTheme].audio
 
+let isMuted = localStorage.getItem('ft_muted') === 'true'
+ambientAudio.muted = isMuted
+
+function updateMuteBtn() {
+  const btn = document.getElementById('muteBtn')
+  if (!btn) return
+  btn.textContent = isMuted ? '🔇' : '🔊'
+  btn.title = isMuted ? 'Unmute sound' : 'Mute sound'
+}
+
+function toggleMute() {
+  isMuted = !isMuted
+  ambientAudio.muted = isMuted
+  localStorage.setItem('ft_muted', isMuted)
+  updateMuteBtn()
+}
+
 // ── Notifications ──────────────────────────────────────────
 let swRegistration = null
 
@@ -231,6 +248,8 @@ updateNotifBanner()
 document.getElementById('startBtn').addEventListener('click', startTimer)
 document.getElementById('stopBtn').addEventListener('click', stopTimer)
 document.getElementById('resetBtn').addEventListener('click', resetTimer)
+document.getElementById('muteBtn').addEventListener('click', toggleMute)
+updateMuteBtn()
 
 document.querySelectorAll('.theme-btn').forEach(btn => {
   btn.addEventListener('click', () => setTheme(btn.dataset.theme))
