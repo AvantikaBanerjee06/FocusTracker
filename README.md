@@ -131,22 +131,6 @@ FocusTracker/
 
 ---
 
-## Screenshots
-
-> Add screenshots here — suggested views to capture:
-
-| View | Description |
-|---|---|
-| `screenshot-home.png` | Home view with focus score and task list |
-| `screenshot-timer-cafe.png` | Timer in Cafe theme |
-| `screenshot-timer-ocean.png` | Timer in Ocean theme |
-| `screenshot-dashboard.png` | Dashboard with all four charts |
-| `screenshot-extension.png` | Extension popup with focus score and approved sites |
-
-To add a screenshot, drop the image into a `/screenshots` folder and update the table above with `![alt](screenshots/filename.png)`.
-
----
-
 ## Privacy
 
 All tracking data is stored locally using `chrome.storage.local` and `localStorage`. No data is sent to any server. Clearing the extension popup resets all stats.
