@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FocusTracker</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 320px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f0f0f;
+      color: #e0e0e0;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid #1e1e1e;
+    }
+
+    header h1 {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: #fff;
+    }
+
+    #clear-btn {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid #333;
+      background: transparent;
+      color: #888;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    #clear-btn:hover {
+      color: #e0e0e0;
+      border-color: #555;
+    }
+
+    .idle-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: #161616;
+      border-bottom: 1px solid #1e1e1e;
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    .idle-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #f59e0b;
+      flex-shrink: 0;
+    }
+
+    .idle-bar span strong {
+      color: #fbbf24;
+    }
+
+    .tab-list {
+      max-height: 320px;
+      overflow-y: auto;
+      padding: 8px 0;
+    }
+
+    .tab-list::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .tab-list::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .tab-list::-webkit-scrollbar-thumb {
+      background: #333;
+      border-radius: 4px;
+    }
+
+    .tab-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      gap: 12px;
+      transition: background 0.1s;
+    }
+
+    .tab-row:hover {
+      background: #171717;
+    }
+
+    .tab-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .tab-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: #e0e0e0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tab-bar-track {
+      height: 3px;
+      background: #222;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .tab-bar-fill {
+      height: 100%;
+      background: #6366f1;
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
+
+    .tab-time {
+      font-size: 12px;
+      color: #888;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .empty {
+      padding: 32px 16px;
+      text-align: center;
+      color: #444;
+      font-size: 13px;
+    }
+
+    footer {
+      padding: 8px 16px;
+      border-top: 1px solid #1e1e1e;
+      font-size: 11px;
+      color: #3a3a3a;
+      text-align: center;
+    }
+
+    .score-section {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid #1e1e1e;
+      background: #111;
+    }
+
+    .score-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .score-label {
+      font-size: 11px;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .score-value {
+      font-size: 36px;
+      font-weight: 700;
+      line-height: 1;
+      color: #e0e0e0;
+      transition: color 0.4s;
+    }
+
+    .score-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+
+    .score-grade {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .score-track {
+      width: 100px;
+      height: 4px;
+      background: #1e1e1e;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .score-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.4s ease, background 0.4s;
+    }
+
+    .approved-section {
+      border-top: 1px solid #1e1e1e;
+    }
+
+    .approved-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 10px 16px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      color: #555;
+      transition: background 0.1s, color 0.1s;
+    }
+
+    .approved-toggle:hover {
+      background: #141414;
+      color: #888;
+    }
+
+    .approved-toggle-label {
+      flex: 1;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      text-align: left;
+    }
+
+    .approved-badge {
+      font-size: 11px;
+      background: #1a1a1a;
+      border: 1px solid #252525;
+      color: #555;
+      padding: 1px 7px;
+      border-radius: 10px;
+    }
+
+    .approved-arrow {
+      font-size: 9px;
+      display: inline-block;
+      transition: transform 0.15s;
+    }
+
+    .approved-body {
+      padding: 4px 16px 14px;
+    }
+
+    .approved-hint {
+      font-size: 11px;
+      color: #383838;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .approved-input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    #approved-input {
+      flex: 1;
+      background: #161616;
+      border: 1px solid #252525;
+      border-radius: 6px;
+      color: #e0e0e0;
+      font-size: 12px;
+      font-family: inherit;
+      padding: 6px 10px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    #approved-input:focus {
+      border-color: #4f46e5;
+    }
+
+    #approved-input::placeholder {
+      color: #333;
+    }
+
+    #approved-add {
+      font-size: 12px;
+      font-family: inherit;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: none;
+      background: #4f46e5;
+      color: #fff;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+
+    #approved-add:hover {
+      background: #6366f1;
+    }
+
+    .approved-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .approved-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 10px;
+      border-radius: 6px;
+      background: #161616;
+    }
+
+    .approved-domain {
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    .approved-remove {
+      background: none;
+      border: none;
+      color: #333;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      padding: 0 2px;
+      transition: color 0.15s;
+    }
+
+    .approved-remove:hover {
+      color: #ef4444;
+    }
+
+    .approved-empty {
+      font-size: 12px;
+      color: #333;
+      padding: 4px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FocusTracker</h1>
+    <button id="clear-btn">Clear</button>
+  </header>
+
+  <div class="score-section">
+    <div class="score-left">
+      <div class="score-label">Focus Score</div>
+      <div class="score-value" id="score-display">--</div>
+    </div>
+    <div class="score-right">
+      <div class="score-grade" id="score-grade"></div>
+      <div class="score-track">
+        <div class="score-fill" id="score-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="idle-bar">
+    <div class="idle-dot"></div>
+    <span>Idle time: <strong id="idle-display">0s</strong></span>
+  </div>
+
+  <div class="tab-list" id="tab-list">
+    <div class="empty">No tab activity yet.</div>
+  </div>
+
+  <div class="approved-section">
+    <button class="approved-toggle" id="approved-toggle">
+      <span class="approved-toggle-label">Approved Sites</span>
+      <span class="approved-badge" id="approved-badge">0</span>
+      <span class="approved-arrow" id="approved-arrow">&#9658;</span>
+    </button>
+    <div class="approved-body" id="approved-body" hidden>
+      <p class="approved-hint">Switching to approved sites won&rsquo;t lower your focus score.</p>
+      <div class="approved-input-row">
+        <input type="text" id="approved-input" placeholder="e.g. notion.com" autocomplete="off" spellcheck="false" />
+        <button id="approved-add">Add</button>
+      </div>
+      <div class="approved-list" id="approved-list"></div>
+    </div>
+  </div>
+
+  <footer>Tracking active tabs &amp; idle time &mdash; All data stays on your device.</footer>
+
+  <script src="popup.js"></script>
+</body>
+</html>

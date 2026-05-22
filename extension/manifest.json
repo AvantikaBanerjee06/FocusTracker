@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "FocusTracker",
+  "version": "1.0.0",
+  "description": "Tracks time spent on each tab and idle time to help you stay focused.",
+  "permissions": [
+    "tabs",
+    "idle",
+    "storage"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "FocusTracker"
+  }
+}
