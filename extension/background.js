@@ -20,6 +20,53 @@ function isApproved(hostname, approvedSites) {
   return approvedSites.some(site => hostname === site || hostname.endsWith('.' + site));
 }
 
+async function saveSnapshot() {
+  const now = Date.now();
+  const hour = new Date(now).getHours();
+  const data = await chrome.storage.local.get(['tabTime', 'switchCount', 'approvedSites', 'snapshots']);
+
+  const tabTime = { ...(data.tabTime || {}) };
+  if (activeTabId !== null && sessionStart !== null && !isIdle) {
+    const elapsed = Math.round((now - sessionStart) / 1000);
+    if (elapsed > 0) {
+      const key = activeTabUrl ? getHostname(activeTabUrl) : 'unknown';
+      tabTime[key] = (tabTime[key] || 0) + elapsed;
+    }
+  }
+
+  const entries = Object.entries(tabTime);
+  const totalSecs = entries.reduce((s, [, v]) => s + v, 0);
+  const totalMins = Math.max(totalSecs / 60, 1);
+  const sc = data.switchCount || 0;
+  const rate = sc / totalMins;
+  const approvedSites = data.approvedSites || [];
+
+  let score;
+  if (approvedSites.length === 0) {
+    score = Math.max(0, Math.round(100 - rate * 50));
+  } else {
+    const approvedSecs = entries
+      .filter(([h]) => isApproved(h, approvedSites))
+      .reduce((s, [, v]) => s + v, 0);
+    const base = totalSecs > 0 ? (approvedSecs / totalSecs) * 100 : 100;
+    score = Math.max(0, Math.round(base - Math.min(30, rate * 15)));
+  }
+
+  const cutoff = now - 48 * 3600 * 1000;
+  const snapshots = (data.snapshots || []).filter(s => s.ts > cutoff);
+  snapshots.push({ ts: now, score, hour });
+  await chrome.storage.local.set({ snapshots });
+}
+
+// Create the alarm once; it persists across service-worker restarts.
+chrome.alarms.get('snapshot', alarm => {
+  if (!alarm) chrome.alarms.create('snapshot', { periodInMinutes: 30 });
+});
+
+chrome.alarms.onAlarm.addListener(alarm => {
+  if (alarm.name === 'snapshot') saveSnapshot();
+});
+
 // MV3 service workers are killed after ~5s of inactivity and all vars reset.
 // On each wake, re-derive the active tab so tracking resumes correctly.
 async function ensureInit() {

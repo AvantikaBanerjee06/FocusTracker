@@ -6,8 +6,13 @@
   "permissions": [
     "tabs",
     "idle",
-    "storage"
+    "storage",
+    "alarms"
   ],
+  "content_scripts": [{
+    "matches": ["http://127.0.0.1/*", "http://localhost/*"],
+    "js": ["content.js"]
+  }],
   "background": {
     "service_worker": "background.js"
   },

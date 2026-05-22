@@ -385,9 +385,133 @@
       color: rgba(255, 255, 255, 0.95);
     }
     .theme-btn:active { transform: scale(0.94); }
+
+    /* ── Nav bar ─────────────────────────────────────────────── */
+    .nav-bar {
+      position: fixed;
+      top: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 4px;
+      z-index: 30;
+      background: rgba(0, 0, 0, 0.38);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 6px 8px;
+      border-radius: 50px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+    }
+
+    .nav-btn {
+      font-family: 'Lato', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 8px 22px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.45);
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .nav-btn:hover  { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.82); }
+    .nav-btn.active { background: rgba(255,255,255,0.2);  color: rgba(255,255,255,0.95); }
+
+    /* ── Dashboard overlay ───────────────────────────────────── */
+    #view-dashboard {
+      position: fixed;
+      inset: 0;
+      overflow-y: auto;
+      z-index: 20;
+      display: none;
+      padding: 80px 20px 48px;
+    }
+
+    #view-dashboard.open { display: block; }
+
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 620px) { .dash-grid { grid-template-columns: 1fr; } }
+
+    .dash-full { grid-column: 1 / -1; }
+
+    .dash-card {
+      background: rgba(8, 8, 8, 0.58);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 20px;
+      padding: 22px 22px 18px;
+    }
+
+    .dash-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.28);
+      margin-bottom: 16px;
+    }
+
+    .chart-wrap { position: relative; }
+
+    /* ── Focus vs Distraction card ───────────────────────────── */
+    .stat-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .stat-block { flex: 1; }
+
+    .stat-val {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.7rem;
+      font-weight: 700;
+      line-height: 1;
+      color: #fff;
+    }
+
+    .stat-lbl {
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.28);
+      margin-top: 5px;
+    }
+
+    .split-track {
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.07);
+      overflow: hidden;
+    }
+
+    .split-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #22c55e 0%, #6366f1 100%);
+      transition: width 0.7s ease;
+      width: 0%;
+    }
   </style>
 </head>
 <body class="theme-cafe">
+
+  <nav class="nav-bar">
+    <button class="nav-btn active" data-view="timer">Timer</button>
+    <button class="nav-btn"        data-view="dashboard">Dashboard</button>
+  </nav>
 
   <div class="card">
     <p class="title">Focus Timer</p>
@@ -422,6 +546,267 @@
     <button class="theme-btn"        data-theme="ocean">Ocean</button>
   </div>
 
+  <!-- Dashboard view -->
+  <div id="view-dashboard">
+    <div class="dash-grid">
+
+      <!-- Focus score over time -->
+      <div class="dash-card dash-full">
+        <p class="dash-title">Focus Score &mdash; Last 24 Hours</p>
+        <div class="chart-wrap" style="height:180px">
+          <canvas id="chart-score"></canvas>
+        </div>
+      </div>
+
+      <!-- Time per site -->
+      <div class="dash-card">
+        <p class="dash-title">Time Per Site</p>
+        <div class="chart-wrap" style="height:210px">
+          <canvas id="chart-sites"></canvas>
+        </div>
+      </div>
+
+      <!-- Focus vs distraction -->
+      <div class="dash-card">
+        <p class="dash-title">Focus vs Distraction</p>
+        <div class="stat-row">
+          <div class="stat-block">
+            <div class="stat-val" id="stat-focus" style="color:#22c55e">--</div>
+            <div class="stat-lbl">Focus</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-val" id="stat-distract" style="color:#f59e0b">--</div>
+            <div class="stat-lbl">Distraction</div>
+          </div>
+          <div class="stat-block">
+            <div class="stat-val" id="stat-idle" style="color:rgba(255,255,255,0.38)">--</div>
+            <div class="stat-lbl">Idle</div>
+          </div>
+        </div>
+        <div class="split-track"><div class="split-fill" id="split-fill"></div></div>
+        <div class="chart-wrap" style="height:120px;margin-top:20px">
+          <canvas id="chart-split"></canvas>
+        </div>
+      </div>
+
+      <!-- Peak focus hours -->
+      <div class="dash-card dash-full">
+        <p class="dash-title">Peak Focus Hours</p>
+        <div class="chart-wrap" style="height:160px">
+          <canvas id="chart-hours"></canvas>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="timer.js"></script>
+  <script>
+  (function () {
+    // ── Nav switching ───────────────────────────────────────────
+    const dashView = document.getElementById('view-dashboard');
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (btn.dataset.view === 'dashboard') {
+          dashView.classList.add('open');
+          loadDashboard();
+        } else {
+          dashView.classList.remove('open');
+        }
+      });
+    });
+
+    // ── Extension data bridge (via content.js postMessage) ─────
+    function fetchData() {
+      return new Promise(resolve => {
+        const t = setTimeout(() => resolve(null), 800);
+        const h = e => {
+          if (e.data?.type !== 'FOCUSTRACKER_DATA') return;
+          window.removeEventListener('message', h);
+          clearTimeout(t);
+          resolve(e.data.data);
+        };
+        window.addEventListener('message', h);
+        window.postMessage({ type: 'FOCUSTRACKER_REQUEST' }, '*');
+      });
+    }
+
+    // ── Helpers ─────────────────────────────────────────────────
+    const NAMES  = { '127.0.0.1': 'Focus Timer', localhost: 'Focus Timer' };
+    const COLORS = ['#6366f1','#22c55e','#f59e0b','#ef4444','#a78bfa','#38bdf8','#fb923c','#34d399'];
+
+    function fmt(s) {
+      if (s < 60)   return `${s}s`;
+      if (s < 3600) return `${Math.floor(s / 60)}m`;
+      return `${Math.floor(s / 3600)}h ${Math.floor((s % 3600) / 60)}m`;
+    }
+
+    function approved(host, list) {
+      return (list || []).some(s => host === s || host.endsWith('.' + s));
+    }
+
+    // ── Chart.js globals ────────────────────────────────────────
+    Chart.defaults.color       = 'rgba(255,255,255,0.35)';
+    Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+    Chart.defaults.font.family = "'Lato', sans-serif";
+    Chart.defaults.font.size   = 11;
+
+    const instances = {};
+    function draw(id, cfg) {
+      if (instances[id]) instances[id].destroy();
+      instances[id] = new Chart(document.getElementById(id), cfg);
+    }
+
+    const SCALE_Y = {
+      min: 0, max: 100,
+      ticks: { stepSize: 25, color: 'rgba(255,255,255,0.3)' },
+      grid:  { color: 'rgba(255,255,255,0.05)' },
+    };
+    const SCALE_X_CLEAN = {
+      grid: { display: false },
+      ticks: { maxRotation: 0, color: 'rgba(255,255,255,0.3)' },
+    };
+
+    // ── Main render ─────────────────────────────────────────────
+    async function loadDashboard() {
+      const raw        = await fetchData();
+      const tabTime    = raw?.tabTime      || {};
+      const idleTime   = raw?.idleTime     || 0;
+      const appSites   = raw?.approvedSites || [];
+      const snapshots  = raw?.snapshots    || [];
+
+      /* 1 ── Focus score over time (line) */
+      const last24 = snapshots.filter(s => s.ts > Date.now() - 86400000);
+      draw('chart-score', {
+        type: 'line',
+        data: {
+          labels: last24.map(s => {
+            const d = new Date(s.ts);
+            return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+          }),
+          datasets: [{
+            data: last24.map(s => s.score),
+            borderColor: '#6366f1',
+            backgroundColor: 'rgba(99,102,241,0.12)',
+            borderWidth: 2,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            fill: true,
+            tension: 0.4,
+          }],
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: SCALE_Y,
+            x: { ...SCALE_X_CLEAN, ticks: { ...SCALE_X_CLEAN.ticks, maxTicksLimit: 8 } },
+          },
+        },
+      });
+
+      /* 2 ── Time per site (doughnut) */
+      const entries = Object.entries(tabTime).sort((a, b) => b[1] - a[1]).slice(0, 7);
+      draw('chart-sites', {
+        type: 'doughnut',
+        data: {
+          labels: entries.map(([h]) => NAMES[h] || h),
+          datasets: [{
+            data: entries.map(([, s]) => s),
+            backgroundColor: COLORS.slice(0, entries.length),
+            borderColor: 'rgba(0,0,0,0.35)',
+            borderWidth: 2,
+            hoverOffset: 8,
+          }],
+        },
+        options: {
+          maintainAspectRatio: false,
+          cutout: '60%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { boxWidth: 10, padding: 12, color: 'rgba(255,255,255,0.42)' },
+            },
+            tooltip: { callbacks: { label: ctx => ` ${fmt(ctx.raw)}` } },
+          },
+        },
+      });
+
+      /* 3 ── Focus vs distraction (stat + bar + mini doughnut) */
+      let focusSecs = 0, distractSecs = 0;
+      for (const [h, s] of Object.entries(tabTime)) {
+        if (approved(h, appSites)) focusSecs += s;
+        else distractSecs += s;
+      }
+      const totalActive = focusSecs + distractSecs;
+      document.getElementById('stat-focus').textContent   = totalActive ? fmt(focusSecs)    : '--';
+      document.getElementById('stat-distract').textContent = totalActive ? fmt(distractSecs) : '--';
+      document.getElementById('stat-idle').textContent    = idleTime    ? fmt(idleTime)      : '--';
+      document.getElementById('split-fill').style.width   =
+        totalActive ? `${Math.round((focusSecs / totalActive) * 100)}%` : '0%';
+
+      draw('chart-split', {
+        type: 'doughnut',
+        data: {
+          labels: ['Focus', 'Distraction', 'Idle'],
+          datasets: [{
+            data: [focusSecs, distractSecs, idleTime],
+            backgroundColor: ['#22c55e', '#f59e0b', 'rgba(255,255,255,0.1)'],
+            borderColor: 'rgba(0,0,0,0.3)',
+            borderWidth: 2,
+            hoverOffset: 6,
+          }],
+        },
+        options: {
+          maintainAspectRatio: false,
+          cutout: '55%',
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: ctx => ` ${fmt(ctx.raw)}` } },
+          },
+        },
+      });
+
+      /* 4 ── Peak focus hours (bar) */
+      const buckets = Array.from({ length: 24 }, () => ({ sum: 0, n: 0 }));
+      for (const s of snapshots) {
+        const h = new Date(s.ts).getHours();
+        buckets[h].sum += s.score;
+        buckets[h].n   += 1;
+      }
+      const avgs = buckets.map(b => b.n ? Math.round(b.sum / b.n) : 0);
+      const hlabels = [
+        '12a','1a','2a','3a','4a','5a','6a','7a','8a','9a','10a','11a',
+        '12p','1p','2p','3p','4p','5p','6p','7p','8p','9p','10p','11p',
+      ];
+      draw('chart-hours', {
+        type: 'bar',
+        data: {
+          labels: hlabels,
+          datasets: [{
+            data: avgs,
+            backgroundColor: avgs.map(v =>
+              v >= 80 ? 'rgba(34,197,94,0.75)'  :
+              v >= 60 ? 'rgba(99,102,241,0.75)' :
+              v >= 40 ? 'rgba(245,158,11,0.75)' :
+              v  > 0  ? 'rgba(239,68,68,0.65)'  :
+                        'rgba(255,255,255,0.05)'
+            ),
+            borderRadius: 4,
+            borderSkipped: false,
+          }],
+        },
+        options: {
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { y: SCALE_Y, x: { ...SCALE_X_CLEAN, ticks: { ...SCALE_X_CLEAN.ticks, font: { size: 10 } } } },
+        },
+      });
+    }
+  })();
+  </script>
 </body>
 </html>
