@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Focus Timer</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏱</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Lato:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ── Default (cafe) token values ─────────────────────── */
+    :root {
+      --card-bg: #fdf6ec;
+      --timer-color: #3e1f05;
+      --title-color: #7a4f2d;
+      --subtitle-color: #b58a60;
+      --divider-color: #d4a574;
+      --muted-color: #c4a07a;
+      --btn-primary-bg: #7a4f2d;
+      --btn-primary-text: #fdf6ec;
+      --btn-primary-shadow: rgba(122, 79, 45, 0.4);
+      --btn-primary-hover: #5e3a1e;
+      --btn-secondary-bg: #e8d5bb;
+      --btn-secondary-text: #7a4f2d;
+      --btn-secondary-hover: #d9c0a0;
+      --btn-ghost-text: #b58a60;
+      --btn-ghost-border: #d4a574;
+      --btn-ghost-hover-bg: #f5e9d8;
+      --btn-ghost-hover-text: #7a4f2d;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Lato', sans-serif;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Slow atmospheric drift on the glow layer */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: -25%;
+      pointer-events: none;
+      z-index: 0;
+      animation: drift 22s ease-in-out infinite alternate;
+    }
+
+    /* Film-grain noise overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+    }
+
+    @keyframes drift {
+      from { transform: translate(0,    0   ) scale(1);    }
+      to   { transform: translate(2.5%, 1.5%) scale(1.05); }
+    }
+
+    /* ══════════════════════════════════════════════════════
+       CAFE  — warm espresso, amber lamp-glow
+    ══════════════════════════════════════════════════════ */
+    body.theme-cafe {
+      background-color: #1a0c04;
+      background-image:
+        radial-gradient(ellipse 80% 55% at 15% 15%, #4a2510 0%, transparent 55%),
+        radial-gradient(ellipse 60% 50% at 85% 85%, #3a1a08 0%, transparent 55%),
+        radial-gradient(ellipse 70% 70% at 50% 50%, #2c1a0e 0%, transparent 80%);
+    }
+    body.theme-cafe::before {
+      background-image:
+        radial-gradient(ellipse 55% 40% at 28% 72%, rgba(190, 95, 20, 0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 45% 35% at 75% 18%, rgba(210, 115, 28, 0.13) 0%, transparent 60%);
+    }
+
+    /* ══════════════════════════════════════════════════════
+       LIBRARY  — dark mahogany, single candlelight overhead
+    ══════════════════════════════════════════════════════ */
+    body.theme-library {
+      background-color: #0d0902;
+      background-image:
+        radial-gradient(ellipse 65% 38% at 50% 3%, #3a2208 0%, transparent 55%),
+        radial-gradient(ellipse 45% 65% at  8% 55%, #1e1406 0%, transparent 55%),
+        radial-gradient(ellipse 45% 65% at 92% 55%, #1e1406 0%, transparent 55%),
+        radial-gradient(ellipse 80% 35% at 50% 105%, #0d0902 0%, transparent 60%);
+    }
+    body.theme-library::before {
+      background-image:
+        radial-gradient(ellipse 28% 22% at 50% 1%, rgba(210, 155, 45, 0.28) 0%, transparent 60%),
+        radial-gradient(ellipse 18% 14% at 37% 3%, rgba(230, 165, 45, 0.10) 0%, transparent 50%),
+        radial-gradient(ellipse 18% 14% at 63% 3%, rgba(230, 165, 45, 0.10) 0%, transparent 50%);
+    }
+    .theme-library {
+      --card-bg: #f5f0e4;
+      --timer-color: #2c1a0a;
+      --title-color: #6b4a1a;
+      --subtitle-color: #9a7a3a;
+      --divider-color: #c9a84c;
+      --muted-color: #9a8050;
+      --btn-primary-bg: #6b4a1a;
+      --btn-primary-text: #f5f0e4;
+      --btn-primary-shadow: rgba(107, 74, 26, 0.4);
+      --btn-primary-hover: #4e3410;
+      --btn-secondary-bg: #e0d0a8;
+      --btn-secondary-text: #4e3410;
+      --btn-secondary-hover: #d0bc90;
+      --btn-ghost-text: #9a7a3a;
+      --btn-ghost-border: #c9a84c;
+      --btn-ghost-hover-bg: #ede5c8;
+      --btn-ghost-hover-text: #6b4a1a;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       FOREST  — deep canopy, light shafts from above
+    ══════════════════════════════════════════════════════ */
+    body.theme-forest {
+      background-color: #051005;
+      background-image:
+        radial-gradient(ellipse 95% 45% at 50% -5%, #1e4d1a 0%, transparent 55%),
+        radial-gradient(ellipse 45% 60% at  4% 60%, #11300d 0%, transparent 50%),
+        radial-gradient(ellipse 45% 60% at 96% 60%, #11300d 0%, transparent 50%),
+        radial-gradient(ellipse 60% 35% at 50% 105%, #08180607 0%, transparent 60%);
+    }
+    body.theme-forest::before {
+      background-image:
+        radial-gradient(ellipse 18% 55% at 42% 0%,  rgba(110, 190, 85,  0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 12% 40% at 58% 0%,  rgba(95,  175, 70,  0.12) 0%, transparent 65%),
+        radial-gradient(ellipse 20% 35% at 25% 12%, rgba(80,  160, 60,  0.09) 0%, transparent 60%),
+        radial-gradient(ellipse 20% 35% at 78% 8%,  rgba(80,  160, 60,  0.07) 0%, transparent 60%);
+    }
+    .theme-forest {
+      --card-bg: #f2f9f2;
+      --timer-color: #1a3d20;
+      --title-color: #3a7a48;
+      --subtitle-color: #60a070;
+      --divider-color: #88c898;
+      --muted-color: #72a882;
+      --btn-primary-bg: #3a7a48;
+      --btn-primary-text: #f2f9f2;
+      --btn-primary-shadow: rgba(58, 122, 72, 0.4);
+      --btn-primary-hover: #2a5c35;
+      --btn-secondary-bg: #c4e8ca;
+      --btn-secondary-text: #2a5c35;
+      --btn-secondary-hover: #b0d8b6;
+      --btn-ghost-text: #60a070;
+      --btn-ghost-border: #88c898;
+      --btn-ghost-hover-bg: #dcf0de;
+      --btn-ghost-hover-text: #3a7a48;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       OCEAN  — midnight deep-sea, light shimmer at surface
+    ══════════════════════════════════════════════════════ */
+    body.theme-ocean {
+      background-color: #03080f;
+      background-image:
+        radial-gradient(ellipse 100% 38% at 50% 0%,  #0e3d5e 0%, transparent 55%),
+        radial-gradient(ellipse  55% 55% at 12% 50%, #061c30 0%, transparent 55%),
+        radial-gradient(ellipse  55% 55% at 88% 50%, #061c30 0%, transparent 55%),
+        radial-gradient(ellipse  80% 35% at 50% 105%, #03080f 0%, transparent 60%);
+    }
+    body.theme-ocean::before {
+      background-image:
+        radial-gradient(ellipse 90% 25% at 50% 0%, rgba(30, 145, 205, 0.22) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 15% at 28% 3%, rgba(55, 185, 230, 0.10) 0%, transparent 50%),
+        radial-gradient(ellipse 35% 12% at 72% 2%, rgba(55, 185, 230, 0.08) 0%, transparent 50%);
+    }
+    .theme-ocean {
+      --card-bg: #edf5ff;
+      --timer-color: #0a1e40;
+      --title-color: #1a5e8a;
+      --subtitle-color: #4080a8;
+      --divider-color: #72c0dc;
+      --muted-color: #60a8c4;
+      --btn-primary-bg: #1a5e8a;
+      --btn-primary-text: #edf5ff;
+      --btn-primary-shadow: rgba(26, 94, 138, 0.4);
+      --btn-primary-hover: #0e4068;
+      --btn-secondary-bg: #bcdcf0;
+      --btn-secondary-text: #0e4068;
+      --btn-secondary-hover: #a4cce4;
+      --btn-ghost-text: #4080a8;
+      --btn-ghost-border: #72c0dc;
+      --btn-ghost-hover-bg: #d8ecf8;
+      --btn-ghost-hover-text: #1a5e8a;
+    }
+
+    /* ── Card ─────────────────────────────────────────────── */
+    .card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 52px 64px 44px;
+      text-align: center;
+      box-shadow:
+        0 16px 70px rgba(0, 0, 0, 0.6),
+        0  4px 18px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.65);
+      max-width: 380px;
+      width: 90%;
+      position: relative;
+      z-index: 2;
+      transition:
+        background-color 0.55s ease,
+        box-shadow       0.55s ease;
+    }
+
+    .title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: var(--title-color);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      transition: color 0.55s ease;
+    }
+
+    .subtitle {
+      font-size: 0.78rem;
+      color: var(--subtitle-color);
+      letter-spacing: 0.08em;
+      margin-bottom: 36px;
+      min-height: 1.1em;
+      transition: color 0.55s ease, opacity 0.25s ease;
+    }
+    .subtitle.fading { opacity: 0; }
+
+    .divider {
+      width: 36px;
+      height: 2px;
+      background: var(--divider-color);
+      margin: 0 auto 32px;
+      border-radius: 2px;
+      transition: background-color 0.55s ease;
+    }
+
+    #timer {
+      font-family: 'Playfair Display', serif;
+      font-size: 5.5rem;
+      font-weight: 700;
+      color: var(--timer-color);
+      letter-spacing: 0.04em;
+      line-height: 1;
+      margin-bottom: 40px;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      transition: color 0.55s ease;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    button {
+      font-family: 'Lato', sans-serif;
+      font-size: 0.76rem;
+      font-weight: 400;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 26px;
+      cursor: pointer;
+      transition:
+        background  0.2s ease,
+        color       0.2s ease,
+        box-shadow  0.2s ease,
+        border-color 0.2s ease,
+        transform   0.1s ease;
+    }
+    button:active { transform: scale(0.96); }
+
+    #startBtn {
+      background: var(--btn-primary-bg);
+      color: var(--btn-primary-text);
+      box-shadow: 0 3px 14px var(--btn-primary-shadow);
+    }
+    #startBtn:hover {
+      background: var(--btn-primary-hover);
+      box-shadow: 0 4px 18px var(--btn-primary-shadow);
+    }
+
+    #stopBtn {
+      background: var(--btn-secondary-bg);
+      color: var(--btn-secondary-text);
+    }
+    #stopBtn:hover { background: var(--btn-secondary-hover); }
+
+    #resetBtn {
+      background: transparent;
+      color: var(--btn-ghost-text);
+      border: 1.5px solid var(--btn-ghost-border);
+    }
+    #resetBtn:hover {
+      background: var(--btn-ghost-hover-bg);
+      color: var(--btn-ghost-hover-text);
+    }
+
+    /* ── Mode label ──────────────────────────────────────── */
+    .mode-label {
+      font-size: 0.66rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted-color);
+      margin-bottom: 14px;
+      transition: color 0.55s ease, opacity 0.2s ease;
+    }
+    .mode-label.fading { opacity: 0; }
+
+    /* ── Pomodoro progress dots ───────────────────────────── */
+    .pomodoro-dots {
+      display: flex;
+      gap: 9px;
+      justify-content: center;
+      margin-top: 28px;
+    }
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--divider-color);
+      opacity: 0.3;
+      transition: background 0.4s ease, opacity 0.4s ease, transform 0.2s ease;
+    }
+    .dot.filled {
+      background: var(--btn-primary-bg);
+      opacity: 1;
+    }
+    .dot.pulse {
+      transform: scale(1.5);
+    }
+
+    /* ── Theme switcher ───────────────────────────────────── */
+    .theme-switcher {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 6px;
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 7px 10px;
+      border-radius: 50px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .theme-btn {
+      font-family: 'Lato', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 7px 16px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.5);
+      transition: background 0.2s ease, color 0.2s ease, transform 0.12s ease;
+    }
+    .theme-btn:hover {
+      background: rgba(255, 255, 255, 0.14);
+      color: rgba(255, 255, 255, 0.85);
+    }
+    .theme-btn.active {
+      background: rgba(255, 255, 255, 0.22);
+      color: rgba(255, 255, 255, 0.95);
+    }
+    .theme-btn:active { transform: scale(0.94); }
+  </style>
+</head>
+<body class="theme-cafe">
+
+  <div class="card">
+    <p class="title">Focus Timer</p>
+    <p class="subtitle" id="subtitle">stay present, one cup at a time</p>
+    <div class="divider"></div>
+
+    <p class="mode-label" id="modeLabel">Focus</p>
+    <h1 id="timer">25:00</h1>
+
+    <div class="controls">
+      <button id="startBtn">Start</button>
+      <button id="stopBtn">Pause</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+
+    <div id="notifBanner" style="display:none;margin-top:20px;font-size:0.72rem;letter-spacing:0.08em;color:var(--subtitle-color);">
+      <button id="notifBtn" style="background:none;border:1px solid var(--divider-color);color:var(--subtitle-color);padding:6px 14px;border-radius:50px;cursor:pointer;font-size:0.72rem;letter-spacing:0.08em;">Enable notifications</button>
+    </div>
+
+    <div class="pomodoro-dots" id="pomodoroTracker">
+      <span class="dot" data-index="0"></span>
+      <span class="dot" data-index="1"></span>
+      <span class="dot" data-index="2"></span>
+      <span class="dot" data-index="3"></span>
+    </div>
+  </div>
+
+  <div class="theme-switcher">
+    <button class="theme-btn active" data-theme="cafe">Cafe</button>
+    <button class="theme-btn"        data-theme="library">Library</button>
+    <button class="theme-btn"        data-theme="forest">Forest</button>
+    <button class="theme-btn"        data-theme="ocean">Ocean</button>
+  </div>
+
+  <script src="timer.js"></script>
+</body>
+</html>
