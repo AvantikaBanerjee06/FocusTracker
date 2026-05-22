@@ -420,17 +420,16 @@
     .nav-btn:hover  { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.82); }
     .nav-btn.active { background: rgba(255,255,255,0.2);  color: rgba(255,255,255,0.95); }
 
-    /* ── Dashboard overlay ───────────────────────────────────── */
-    #view-dashboard {
+    /* ── Shared overlay panel ───────────────────────────────────── */
+    .panel {
       position: fixed;
       inset: 0;
       overflow-y: auto;
       z-index: 20;
       display: none;
-      padding: 80px 20px 48px;
+      padding: 80px 20px 52px;
     }
-
-    #view-dashboard.open { display: block; }
+    .panel.open { display: block; }
 
     .dash-grid {
       display: grid;
@@ -504,13 +503,256 @@
       transition: width 0.7s ease;
       width: 0%;
     }
+
+    /* ── Home view ───────────────────────────────────────────── */
+    .home-wrap {
+      max-width: 460px;
+      margin: 0 auto;
+      padding-top: 12px;
+      text-align: center;
+    }
+    .home-greeting {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.1rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 6px;
+    }
+    .home-date {
+      font-size: 0.74rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.28);
+      margin-bottom: 32px;
+    }
+    .home-score-card {
+      background: rgba(8,8,8,0.55);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 24px;
+      padding: 32px 24px 28px;
+      margin-bottom: 14px;
+    }
+    .home-score-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 5rem;
+      font-weight: 700;
+      line-height: 1;
+      color: rgba(255,255,255,0.28);
+      transition: color 0.4s;
+    }
+    .home-score-lbl {
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      margin-top: 10px;
+    }
+    .home-stats-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .home-stat-card {
+      flex: 1;
+      background: rgba(8,8,8,0.55);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 16px 10px;
+    }
+    .home-stat-val {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      line-height: 1;
+      color: #fff;
+    }
+    .home-stat-lbl {
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.26);
+      margin-top: 6px;
+    }
+    .home-actions { display: flex; gap: 10px; }
+    .home-btn {
+      flex: 1;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      padding: 14px 20px;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .home-btn-primary { background: rgba(99,102,241,0.85); color: #fff; }
+    .home-btn-primary:hover { background: rgb(99,102,241); }
+    .home-btn-ghost {
+      background: rgba(255,255,255,0.07);
+      color: rgba(255,255,255,0.55);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .home-btn-ghost:hover { background: rgba(255,255,255,0.13); color: rgba(255,255,255,0.9); }
+
+    /* ── Date range bar ──────────────────────────────────────── */
+    .range-bar {
+      display: flex;
+      gap: 6px;
+      max-width: 860px;
+      margin: 0 auto 16px;
+    }
+    .range-btn {
+      font-family: 'Lato', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 7px 16px;
+      border-radius: 50px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: transparent;
+      color: rgba(255,255,255,0.35);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .range-btn:hover  { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.72); }
+    .range-btn.active { background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.95); border-color: rgba(255,255,255,0.28); }
+
+    /* ── Tasks view ──────────────────────────────────────────── */
+    .tasks-wrap { max-width: 540px; margin: 0 auto; padding-top: 8px; }
+    .tasks-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.74rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.26);
+      margin-bottom: 18px;
+    }
+    .task-input-row { display: flex; gap: 10px; margin-bottom: 14px; }
+    #task-input {
+      flex: 1;
+      background: rgba(8,8,8,0.55);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: rgba(255,255,255,0.88);
+      font-family: 'Lato', sans-serif;
+      font-size: 0.9rem;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    #task-input:focus { border-color: rgba(99,102,241,0.65); }
+    #task-input::placeholder { color: rgba(255,255,255,0.18); }
+    #task-add-btn {
+      font-family: 'Lato', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 12px 20px;
+      border-radius: 12px;
+      border: none;
+      background: rgba(99,102,241,0.85);
+      color: #fff;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    #task-add-btn:hover { background: rgb(99,102,241); }
+    .task-list { display: flex; flex-direction: column; gap: 8px; }
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(8,8,8,0.55);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 14px 16px;
+      transition: opacity 0.2s;
+    }
+    .task-item.done { opacity: 0.42; }
+    .task-check {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.25);
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .task-check.checked { background: #22c55e; border-color: #22c55e; }
+    .task-check.checked::after { content: '✓'; color: #fff; font-size: 10px; line-height: 1; }
+    .task-text {
+      flex: 1;
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.85);
+      transition: color 0.2s;
+      word-break: break-word;
+    }
+    .task-item.done .task-text { text-decoration: line-through; color: rgba(255,255,255,0.32); }
+    .task-del {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.16);
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      padding: 0 2px;
+      flex-shrink: 0;
+      transition: color 0.15s;
+    }
+    .task-del:hover { color: #ef4444; }
+    .task-empty {
+      text-align: center;
+      color: rgba(255,255,255,0.18);
+      font-size: 0.82rem;
+      letter-spacing: 0.06em;
+      padding: 36px 0;
+    }
+    .tasks-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      padding: 0 2px;
+    }
+    .tasks-count {
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.22);
+    }
+    .tasks-clear-btn {
+      font-family: 'Lato', sans-serif;
+      font-size: 0.66rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.2);
+      cursor: pointer;
+      padding: 4px 0;
+      transition: color 0.15s;
+    }
+    .tasks-clear-btn:hover { color: #ef4444; }
   </style>
 </head>
 <body class="theme-cafe">
 
   <nav class="nav-bar">
-    <button class="nav-btn active" data-view="timer">Timer</button>
+    <button class="nav-btn active" data-view="home">Home</button>
+    <button class="nav-btn"        data-view="timer">Timer</button>
     <button class="nav-btn"        data-view="dashboard">Dashboard</button>
+    <button class="nav-btn"        data-view="tasks">Tasks</button>
   </nav>
 
   <div class="card">
@@ -546,13 +788,51 @@
     <button class="theme-btn"        data-theme="ocean">Ocean</button>
   </div>
 
+  <!-- Home view -->
+  <div id="view-home" class="panel open">
+    <div class="home-wrap">
+      <p class="home-greeting" id="home-greeting">Good morning.</p>
+      <p class="home-date" id="home-date"></p>
+
+      <div class="home-score-card">
+        <div class="home-score-num" id="home-score-num">--</div>
+        <div class="home-score-lbl">Focus Score</div>
+      </div>
+
+      <div class="home-stats-row">
+        <div class="home-stat-card">
+          <div class="home-stat-val" id="home-focus-val">--</div>
+          <div class="home-stat-lbl" style="color:#22c55e88">Focus</div>
+        </div>
+        <div class="home-stat-card">
+          <div class="home-stat-val" id="home-distract-val">--</div>
+          <div class="home-stat-lbl" style="color:#f59e0b88">Distraction</div>
+        </div>
+        <div class="home-stat-card">
+          <div class="home-stat-val" id="home-tasks-val">--</div>
+          <div class="home-stat-lbl">Tasks Done</div>
+        </div>
+      </div>
+
+      <div class="home-actions">
+        <button class="home-btn home-btn-primary" id="home-timer-btn">Start Session</button>
+        <button class="home-btn home-btn-ghost"   id="home-dash-btn">Dashboard</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Dashboard view -->
-  <div id="view-dashboard">
+  <div id="view-dashboard" class="panel">
+    <div class="range-bar">
+      <button class="range-btn active" data-range="today">Today</button>
+      <button class="range-btn"        data-range="week">This Week</button>
+      <button class="range-btn"        data-range="month">This Month</button>
+    </div>
     <div class="dash-grid">
 
       <!-- Focus score over time -->
       <div class="dash-card dash-full">
-        <p class="dash-title">Focus Score &mdash; Last 24 Hours</p>
+        <p class="dash-title" id="score-chart-title">Focus Score &mdash; Today</p>
         <div class="chart-wrap" style="height:180px">
           <canvas id="chart-score"></canvas>
         </div>
@@ -598,28 +878,63 @@
       </div>
 
     </div>
+  </div><!-- /#view-dashboard -->
+
+  <!-- Tasks view -->
+  <div id="view-tasks" class="panel">
+    <div class="tasks-wrap">
+      <p class="tasks-heading">To-Do List</p>
+      <div class="task-input-row">
+        <input type="text" id="task-input" placeholder="Add a task…" autocomplete="off" />
+        <button id="task-add-btn">Add</button>
+      </div>
+      <div class="task-list" id="task-list"></div>
+      <div class="tasks-footer">
+        <span class="tasks-count" id="tasks-count"></span>
+        <button class="tasks-clear-btn" id="tasks-clear-btn">Clear completed</button>
+      </div>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="timer.js"></script>
   <script>
   (function () {
-    // ── Nav switching ───────────────────────────────────────────
-    const dashView = document.getElementById('view-dashboard');
+    // ── State ────────────────────────────────────────────────────
+    let currentRange   = 'today';
+    let dashRefreshId  = null;
+
+    // ── Panel & nav management ───────────────────────────────────
+    const PANELS = {
+      home:      document.getElementById('view-home'),
+      dashboard: document.getElementById('view-dashboard'),
+      tasks:     document.getElementById('view-tasks'),
+    };
+
+    function switchTo(view) {
+      Object.values(PANELS).forEach(p => p.classList.remove('open'));
+      stopDashRefresh();
+      if (view === 'home')      { PANELS.home.classList.add('open');      loadHome(); }
+      if (view === 'dashboard') { PANELS.dashboard.classList.add('open'); loadDashboard(); startDashRefresh(); }
+      if (view === 'tasks')     { PANELS.tasks.classList.add('open');     renderTasks(); }
+      // 'timer' — just close overlays so the card behind shows
+    }
+
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        if (btn.dataset.view === 'dashboard') {
-          dashView.classList.add('open');
-          loadDashboard();
-        } else {
-          dashView.classList.remove('open');
-        }
+        switchTo(btn.dataset.view);
       });
     });
 
-    // ── Extension data bridge (via content.js postMessage) ─────
+    function navTo(view) {
+      document.querySelectorAll('.nav-btn').forEach(b =>
+        b.classList.toggle('active', b.dataset.view === view));
+      switchTo(view);
+    }
+
+    // ── Extension data bridge ────────────────────────────────────
     function fetchData() {
       return new Promise(resolve => {
         const t = setTimeout(() => resolve(null), 800);
@@ -634,7 +949,7 @@
       });
     }
 
-    // ── Helpers ─────────────────────────────────────────────────
+    // ── Helpers ──────────────────────────────────────────────────
     const NAMES  = { '127.0.0.1': 'Focus Timer', localhost: 'Focus Timer' };
     const COLORS = ['#6366f1','#22c55e','#f59e0b','#ef4444','#a78bfa','#38bdf8','#fb923c','#34d399'];
 
@@ -644,11 +959,22 @@
       return `${Math.floor(s / 3600)}h ${Math.floor((s % 3600) / 60)}m`;
     }
 
-    function approved(host, list) {
+    function isApproved(host, list) {
       return (list || []).some(s => host === s || host.endsWith('.' + s));
     }
 
-    // ── Chart.js globals ────────────────────────────────────────
+    function calcScore(tabTime, switchCount, appSites) {
+      const entries   = Object.entries(tabTime || {});
+      const totalSecs = entries.reduce((a, [, v]) => a + v, 0);
+      const totalMins = Math.max(totalSecs / 60, 1);
+      const rate      = (switchCount || 0) / totalMins;
+      if (!appSites.length) return Math.max(0, Math.round(100 - rate * 50));
+      const appSecs   = entries.filter(([h]) => isApproved(h, appSites)).reduce((a, [, v]) => a + v, 0);
+      const base      = totalSecs > 0 ? (appSecs / totalSecs) * 100 : 100;
+      return Math.max(0, Math.round(base - Math.min(30, rate * 15)));
+    }
+
+    // ── Chart.js globals ─────────────────────────────────────────
     Chart.defaults.color       = 'rgba(255,255,255,0.35)';
     Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
     Chart.defaults.font.family = "'Lato', sans-serif";
@@ -665,34 +991,105 @@
       ticks: { stepSize: 25, color: 'rgba(255,255,255,0.3)' },
       grid:  { color: 'rgba(255,255,255,0.05)' },
     };
-    const SCALE_X_CLEAN = {
+    const SCALE_X = {
       grid: { display: false },
       ticks: { maxRotation: 0, color: 'rgba(255,255,255,0.3)' },
     };
 
-    // ── Main render ─────────────────────────────────────────────
-    async function loadDashboard() {
-      const raw        = await fetchData();
-      const tabTime    = raw?.tabTime      || {};
-      const idleTime   = raw?.idleTime     || 0;
-      const appSites   = raw?.approvedSites || [];
-      const snapshots  = raw?.snapshots    || [];
+    // ── Home view ────────────────────────────────────────────────
+    async function loadHome() {
+      const h = new Date().getHours();
+      document.getElementById('home-greeting').textContent =
+        h < 12 ? 'Good morning.' : h < 17 ? 'Good afternoon.' : 'Good evening.';
+      document.getElementById('home-date').textContent =
+        new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
 
-      /* 1 ── Focus score over time (line) */
-      const last24 = snapshots.filter(s => s.ts > Date.now() - 86400000);
+      const raw      = await fetchData();
+      const tabTime  = raw?.tabTime      || {};
+      const appSites = raw?.approvedSites || [];
+      const entries  = Object.entries(tabTime);
+      const hasData  = entries.length > 0 || (raw?.switchCount || 0) > 0;
+
+      const scoreEl = document.getElementById('home-score-num');
+      if (!raw || !hasData) {
+        scoreEl.textContent = '--';
+        scoreEl.style.color = 'rgba(255,255,255,0.28)';
+      } else {
+        const score = calcScore(tabTime, raw.switchCount, appSites);
+        scoreEl.textContent = score;
+        scoreEl.style.color =
+          score >= 80 ? '#22c55e' : score >= 60 ? '#84cc16' :
+          score >= 40 ? '#f59e0b' : '#ef4444';
+      }
+
+      let focusSecs = 0, distractSecs = 0;
+      for (const [host, secs] of entries) {
+        if (isApproved(host, appSites)) focusSecs += secs;
+        else distractSecs += secs;
+      }
+      document.getElementById('home-focus-val').textContent    = focusSecs    ? fmt(focusSecs)    : '--';
+      document.getElementById('home-distract-val').textContent = distractSecs ? fmt(distractSecs) : '--';
+
+      const tasks = getTasks();
+      const done  = tasks.filter(t => t.done).length;
+      document.getElementById('home-tasks-val').textContent    = tasks.length ? `${done}/${tasks.length}` : '--';
+    }
+
+    document.getElementById('home-timer-btn').addEventListener('click', () => navTo('timer'));
+    document.getElementById('home-dash-btn').addEventListener('click',  () => navTo('dashboard'));
+
+    // ── Dashboard — date range ───────────────────────────────────
+    document.querySelectorAll('.range-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentRange = btn.dataset.range;
+        loadDashboard();
+      });
+    });
+
+    function startDashRefresh() {
+      stopDashRefresh();
+      dashRefreshId = setInterval(loadDashboard, 10000);
+    }
+    function stopDashRefresh() {
+      clearInterval(dashRefreshId);
+      dashRefreshId = null;
+    }
+
+    const RANGE_MS    = { today: 86400000, week: 7*86400000, month: 30*86400000 };
+    const RANGE_LABEL = { today: 'Today',  week: 'This Week', month: 'This Month' };
+
+    async function loadDashboard() {
+      const raw       = await fetchData();
+      const tabTime   = raw?.tabTime      || {};
+      const idleTime  = raw?.idleTime     || 0;
+      const appSites  = raw?.approvedSites || [];
+      const snapshots = raw?.snapshots    || [];
+
+      const cutoff   = Date.now() - RANGE_MS[currentRange];
+      const filtered = snapshots.filter(s => s.ts > cutoff);
+
+      document.getElementById('score-chart-title').textContent =
+        `Focus Score — ${RANGE_LABEL[currentRange]}`;
+
+      /* 1 – Focus score over time */
+      const labelFn = ts => {
+        const d = new Date(ts);
+        return currentRange === 'today'
+          ? `${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`
+          : `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}h`;
+      };
       draw('chart-score', {
         type: 'line',
         data: {
-          labels: last24.map(s => {
-            const d = new Date(s.ts);
-            return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
-          }),
+          labels: filtered.map(s => labelFn(s.ts)),
           datasets: [{
-            data: last24.map(s => s.score),
+            data: filtered.map(s => s.score),
             borderColor: '#6366f1',
             backgroundColor: 'rgba(99,102,241,0.12)',
             borderWidth: 2,
-            pointRadius: 3,
+            pointRadius: filtered.length > 48 ? 0 : 3,
             pointHoverRadius: 5,
             fill: true,
             tension: 0.4,
@@ -701,21 +1098,18 @@
         options: {
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
-          scales: {
-            y: SCALE_Y,
-            x: { ...SCALE_X_CLEAN, ticks: { ...SCALE_X_CLEAN.ticks, maxTicksLimit: 8 } },
-          },
+          scales: { y: SCALE_Y, x: { ...SCALE_X, ticks: { ...SCALE_X.ticks, maxTicksLimit: 8 } } },
         },
       });
 
-      /* 2 ── Time per site (doughnut) */
-      const entries = Object.entries(tabTime).sort((a, b) => b[1] - a[1]).slice(0, 7);
+      /* 2 – Time per site */
+      const entries = Object.entries(tabTime).sort((a,b) => b[1]-a[1]).slice(0,7);
       draw('chart-sites', {
         type: 'doughnut',
         data: {
           labels: entries.map(([h]) => NAMES[h] || h),
           datasets: [{
-            data: entries.map(([, s]) => s),
+            data: entries.map(([,s]) => s),
             backgroundColor: COLORS.slice(0, entries.length),
             borderColor: 'rgba(0,0,0,0.35)',
             borderWidth: 2,
@@ -726,35 +1120,32 @@
           maintainAspectRatio: false,
           cutout: '60%',
           plugins: {
-            legend: {
-              position: 'bottom',
-              labels: { boxWidth: 10, padding: 12, color: 'rgba(255,255,255,0.42)' },
-            },
+            legend: { position:'bottom', labels:{ boxWidth:10, padding:12, color:'rgba(255,255,255,0.42)' } },
             tooltip: { callbacks: { label: ctx => ` ${fmt(ctx.raw)}` } },
           },
         },
       });
 
-      /* 3 ── Focus vs distraction (stat + bar + mini doughnut) */
+      /* 3 – Focus vs distraction */
       let focusSecs = 0, distractSecs = 0;
       for (const [h, s] of Object.entries(tabTime)) {
-        if (approved(h, appSites)) focusSecs += s;
+        if (isApproved(h, appSites)) focusSecs += s;
         else distractSecs += s;
       }
       const totalActive = focusSecs + distractSecs;
-      document.getElementById('stat-focus').textContent   = totalActive ? fmt(focusSecs)    : '--';
+      document.getElementById('stat-focus').textContent    = totalActive ? fmt(focusSecs)    : '--';
       document.getElementById('stat-distract').textContent = totalActive ? fmt(distractSecs) : '--';
-      document.getElementById('stat-idle').textContent    = idleTime    ? fmt(idleTime)      : '--';
-      document.getElementById('split-fill').style.width   =
-        totalActive ? `${Math.round((focusSecs / totalActive) * 100)}%` : '0%';
+      document.getElementById('stat-idle').textContent     = idleTime    ? fmt(idleTime)     : '--';
+      document.getElementById('split-fill').style.width    =
+        totalActive ? `${Math.round(focusSecs / totalActive * 100)}%` : '0%';
 
       draw('chart-split', {
         type: 'doughnut',
         data: {
-          labels: ['Focus', 'Distraction', 'Idle'],
+          labels: ['Focus','Distraction','Idle'],
           datasets: [{
             data: [focusSecs, distractSecs, idleTime],
-            backgroundColor: ['#22c55e', '#f59e0b', 'rgba(255,255,255,0.1)'],
+            backgroundColor: ['#22c55e','#f59e0b','rgba(255,255,255,0.1)'],
             borderColor: 'rgba(0,0,0,0.3)',
             borderWidth: 2,
             hoverOffset: 6,
@@ -770,12 +1161,12 @@
         },
       });
 
-      /* 4 ── Peak focus hours (bar) */
+      /* 4 – Peak focus hours (averaged over the selected range) */
       const buckets = Array.from({ length: 24 }, () => ({ sum: 0, n: 0 }));
-      for (const s of snapshots) {
-        const h = new Date(s.ts).getHours();
-        buckets[h].sum += s.score;
-        buckets[h].n   += 1;
+      for (const s of filtered) {
+        const hh = new Date(s.ts).getHours();
+        buckets[hh].sum += s.score;
+        buckets[hh].n   += 1;
       }
       const avgs = buckets.map(b => b.n ? Math.round(b.sum / b.n) : 0);
       const hlabels = [
@@ -802,10 +1193,90 @@
         options: {
           maintainAspectRatio: false,
           plugins: { legend: { display: false } },
-          scales: { y: SCALE_Y, x: { ...SCALE_X_CLEAN, ticks: { ...SCALE_X_CLEAN.ticks, font: { size: 10 } } } },
+          scales: { y: SCALE_Y, x: { ...SCALE_X, ticks: { ...SCALE_X.ticks, font: { size: 10 } } } },
         },
       });
     }
+
+    // ── Tasks ────────────────────────────────────────────────────
+    function getTasks() {
+      try { return JSON.parse(localStorage.getItem('ft_tasks') || '[]'); } catch { return []; }
+    }
+    function saveTasks(tasks) { localStorage.setItem('ft_tasks', JSON.stringify(tasks)); }
+
+    function renderTasks() {
+      const tasks = getTasks();
+      const done  = tasks.filter(t => t.done).length;
+      document.getElementById('tasks-count').textContent =
+        tasks.length ? `${done} of ${tasks.length} complete` : '';
+
+      const list = document.getElementById('task-list');
+      list.innerHTML = '';
+
+      if (!tasks.length) {
+        const el = document.createElement('div');
+        el.className = 'task-empty';
+        el.textContent = 'No tasks yet. Add one above.';
+        list.appendChild(el);
+        return;
+      }
+
+      // Pending first, completed last
+      [...tasks].sort((a, b) => a.done - b.done).forEach(task => {
+        const row   = document.createElement('div');
+        row.className = `task-item${task.done ? ' done' : ''}`;
+
+        const check = document.createElement('div');
+        check.className = `task-check${task.done ? ' checked' : ''}`;
+        check.addEventListener('click', () => {
+          const all = getTasks();
+          const t   = all.find(x => x.id === task.id);
+          if (t) { t.done = !t.done; saveTasks(all); renderTasks(); }
+        });
+
+        const text = document.createElement('span');
+        text.className   = 'task-text';
+        text.textContent = task.text;
+
+        const del = document.createElement('button');
+        del.className   = 'task-del';
+        del.textContent = '×';
+        del.title       = 'Delete';
+        del.addEventListener('click', () => {
+          saveTasks(getTasks().filter(x => x.id !== task.id));
+          renderTasks();
+        });
+
+        row.appendChild(check);
+        row.appendChild(text);
+        row.appendChild(del);
+        list.appendChild(row);
+      });
+    }
+
+    function addTask() {
+      const input = document.getElementById('task-input');
+      const text  = input.value.trim();
+      if (!text) return;
+      const tasks = getTasks();
+      tasks.unshift({ id: Date.now(), text, done: false });
+      saveTasks(tasks);
+      renderTasks();
+      input.value = '';
+    }
+
+    document.getElementById('task-add-btn').addEventListener('click', addTask);
+    document.getElementById('task-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addTask();
+    });
+    document.getElementById('tasks-clear-btn').addEventListener('click', () => {
+      saveTasks(getTasks().filter(t => !t.done));
+      renderTasks();
+    });
+
+    // ── Init ─────────────────────────────────────────────────────
+    loadHome();
+    renderTasks();
   })();
   </script>
 </body>

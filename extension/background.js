@@ -52,7 +52,7 @@ async function saveSnapshot() {
     score = Math.max(0, Math.round(base - Math.min(30, rate * 15)));
   }
 
-  const cutoff = now - 48 * 3600 * 1000;
+  const cutoff = now - 30 * 24 * 3600 * 1000;
   const snapshots = (data.snapshots || []).filter(s => s.ts > cutoff);
   snapshots.push({ ts: now, score, hour });
   await chrome.storage.local.set({ snapshots });
@@ -161,6 +161,7 @@ chrome.idle.onStateChanged.addListener(async (newState) => {
     sessionStart = null;
     isIdle = true;
     idleStart = now;
+    
   } else if (newState === "active") {
     await flushIdleTime(now);
     isIdle = false;
